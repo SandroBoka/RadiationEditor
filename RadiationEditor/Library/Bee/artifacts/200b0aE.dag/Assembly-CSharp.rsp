@@ -426,7 +426,10 @@
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.3f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.3f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
 "Assets/Scripts/Camera/EditorFlyCamera.cs"
+"Assets/Scripts/Core/ShapeManager.cs"
 "Assets/Scripts/Data/MaterialLibrary.cs"
+"Assets/Scripts/Data/ShapeData.cs"
+"Assets/Scripts/Data/ShapeType.cs"
 -langversion:9.0
 /deterministic
 /optimize+
