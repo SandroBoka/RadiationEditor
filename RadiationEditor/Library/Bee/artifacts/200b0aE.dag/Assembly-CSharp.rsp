@@ -430,6 +430,7 @@
 "Assets/Scripts/Data/MaterialLibrary.cs"
 "Assets/Scripts/Data/ShapeData.cs"
 "Assets/Scripts/Data/ShapeType.cs"
+"Assets/Scripts/UI/TransformHud.cs"
 -langversion:9.0
 /deterministic
 /optimize+
