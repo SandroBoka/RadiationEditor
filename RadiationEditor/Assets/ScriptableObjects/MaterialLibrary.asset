@@ -12,4 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c23d65bca74eb4328890fdf2e9b532ad, type: 3}
   m_Name: MaterialLibrary
   m_EditorClassIdentifier: Assembly-CSharp::MaterialLibrary
-  materials: []
+  materials:
+  - {fileID: 2100000, guid: 4068d4d5d480f45159cbdeee83148d80, type: 2}
+  - {fileID: 2100000, guid: a71ae67e1897646338f310104f07ce5f, type: 2}
+  - {fileID: 2100000, guid: 3139ae145c56448379b687f934aabcf0, type: 2}
+  - {fileID: 2100000, guid: 0475ae2c38df841e3bd8a4aa448f5bec, type: 2}
+  - {fileID: 2100000, guid: 6a1cffe8e628e4feb9c895f9903003ee, type: 2}
