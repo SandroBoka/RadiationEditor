@@ -129,6 +129,7 @@
 -define:ENABLE_TILEMAP
 -define:ENABLE_TIMELINE
 -define:ENABLE_INPUT_SYSTEM
+-define:ENABLE_LEGACY_INPUT_MANAGER
 -define:TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
 -define:TEXTCORE_TEXT_ENGINE_1_5_OR_NEWER
 -define:TEXTCORE_FONT_ENGINE_1_6_OR_NEWER
@@ -426,10 +427,16 @@
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.3f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.3f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
 "Assets/Scripts/Camera/EditorFlyCamera.cs"
+"Assets/Scripts/Core/SelectionManager.cs"
 "Assets/Scripts/Core/ShapeManager.cs"
 "Assets/Scripts/Data/MaterialLibrary.cs"
 "Assets/Scripts/Data/ShapeData.cs"
 "Assets/Scripts/Data/ShapeType.cs"
+"Assets/Scripts/Export/CsvExporter.cs"
+"Assets/Scripts/Gizmo/GizmoAxis.cs"
+"Assets/Scripts/Gizmo/GizmoHandle.cs"
+"Assets/Scripts/Gizmo/TransformGizmo.cs"
+"Assets/Scripts/UI/HudSpawner.cs"
 "Assets/Scripts/UI/TransformHud.cs"
 -langversion:9.0
 /deterministic
