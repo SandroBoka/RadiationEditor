@@ -12,7 +12,7 @@ public class CsvExporter : MonoBehaviour
         int id = 0;
 
         ShapeManager.I.shapes.RemoveAll(s => s == null);
-        
+
         foreach (var s in ShapeManager.I.shapes)
         {
             if (!s) continue;
@@ -24,41 +24,40 @@ public class CsvExporter : MonoBehaviour
             var e = s.transform.eulerAngles;
 
             sb.Append(id++).Append(',')
-            .Append(s.type).Append(',')
-            .Append(Escape(s.materialName)).Append(',')
-
-            // position
-            .Append(p.x.ToString("0.######")).Append(',')
-            .Append(p.y.ToString("0.######")).Append(',')
-            .Append(p.z.ToString("0.######")).Append(',')
-
-            // scale
-            .Append(sc.x.ToString("0.######")).Append(',')
-            .Append(sc.y.ToString("0.######")).Append(',')
-            .Append(sc.z.ToString("0.######")).Append(',')
-
-            // rotation
-            .Append(e.x.ToString("0.######")).Append(',')
-            .Append(e.y.ToString("0.######")).Append(',')
-            .Append(e.z.ToString("0.######")).Append(',')
-
-            // geometry
-            .Append(s.radius.ToString("0.######")).Append(',')
-            .Append(s.radiusX.ToString("0.######")).Append(',')
-            .Append(s.radiusZ.ToString("0.######")).Append(',')
-            .Append(s.height.ToString("0.######"))
-            .AppendLine();
+              .Append(s.type).Append(',')
+              .Append(Escape(s.materialName)).Append(',')
+              .Append(p.x.ToString("0.######")).Append(',')
+              .Append(p.y.ToString("0.######")).Append(',')
+              .Append(p.z.ToString("0.######")).Append(',')
+              .Append(sc.x.ToString("0.######")).Append(',')
+              .Append(sc.y.ToString("0.######")).Append(',')
+              .Append(sc.z.ToString("0.######")).Append(',')
+              .Append(e.x.ToString("0.######")).Append(',')
+              .Append(e.y.ToString("0.######")).Append(',')
+              .Append(e.z.ToString("0.######")).Append(',')
+              .Append(s.radius.ToString("0.######")).Append(',')
+              .Append(s.radiusX.ToString("0.######")).Append(',')
+              .Append(s.radiusZ.ToString("0.######")).Append(',')
+              .Append(s.height.ToString("0.######"))
+              .AppendLine();
         }
 
         string fileName = "radiation_shapes_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
-        string path = Path.Combine(Application.persistentDataPath, fileName);
+
+        // Desktop path (cross-platform)
+        string desktop = System.Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory);
+
+        // fallback ako iz nekog razloga desktop nije dostupan
+        if (string.IsNullOrEmpty(desktop))
+            desktop = Application.persistentDataPath;
+
+        string path = Path.Combine(desktop, fileName);
+
         File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
 
         Debug.Log("CSV exported: " + path);
-        Debug.Log("persistentDataPath: " + Application.persistentDataPath);
     }
 
-    // da CSV ne pukne ako materijal ima zarez ili navodnike
     string Escape(string v)
     {
         if (string.IsNullOrEmpty(v)) return "";
