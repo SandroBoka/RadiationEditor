@@ -12,6 +12,11 @@ public class SelectionManager : MonoBehaviour
 
     public ShapeData Selected { get; private set; }
 
+    public void ClearSelection()
+    {
+        Select(null);
+    }
+
     void Awake()
     {
         Select(null); // na startu ništa nije selektirano

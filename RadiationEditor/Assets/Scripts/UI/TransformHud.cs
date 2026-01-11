@@ -88,6 +88,23 @@ public TMP_InputField rotZ;
         }
     }
 
+    public void DeleteSelected()
+    {
+        if (!target) return;
+
+        ShapeData toDelete = target;
+
+        ShapeManager.I.shapes.Remove(toDelete);
+
+        Destroy(toDelete.gameObject);
+
+        FindObjectOfType<SelectionManager>()?.ClearSelection();
+
+        if (selectionPanel != null)
+            selectionPanel.SetActive(false);
+    }
+
+
     void ApplyTransform()
     {
         if (!target) return;

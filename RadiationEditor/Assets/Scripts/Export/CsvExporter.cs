@@ -10,6 +10,9 @@ public class CsvExporter : MonoBehaviour
         sb.AppendLine("id,type,material,px,py,pz,sx,sy,sz,rx,ry,rz,radius,radiusX,radiusZ,height");
 
         int id = 0;
+
+        ShapeManager.I.shapes.RemoveAll(s => s == null);
+        
         foreach (var s in ShapeManager.I.shapes)
         {
             if (!s) continue;
