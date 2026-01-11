@@ -3,35 +3,45 @@ using UnityEngine.EventSystems;
 
 public class SelectionManager : MonoBehaviour
 {
+    public LayerMask gizmoLayer;
+    public LayerMask selectableLayers;
+
     public Camera cam;
     public TransformGizmo gizmo;
     public TransformHud hud;
 
     public ShapeData Selected { get; private set; }
-    public LayerMask selectableLayers = ~0; // default: sve
+
+    void Awake()
+    {
+        Select(null); // na startu ništa nije selektirano
+    }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
+
+        if (Input.GetMouseButton(1))
+            return;
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+
+        // 1) klik na gizmo -> NE MIJENJAJ selekciju
+        if (Physics.Raycast(ray, out _, 1000f, gizmoLayer))
+            return;
+
+        // 2) selekcija shapea
+        if (Physics.Raycast(ray, out RaycastHit hit, 1000f, selectableLayers))
         {
-            // UI click should not select
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-                return;
-
-            // if RMB then we do not select
-            if (Input.GetMouseButton(1))
-                return;
-
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 1000f, selectableLayers))
-            {
-                var data = hit.collider.GetComponentInParent<ShapeData>();
-                Select(data);
-            }
-            else
-            {
-                Select(null);
-            }
+            var data = hit.collider.GetComponentInParent<ShapeData>();
+            Select(data);
+        }
+        else
+        {
+            Select(null);
         }
     }
 

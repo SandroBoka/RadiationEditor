@@ -37,6 +37,7 @@ public class ShapeManager : MonoBehaviour
         }
 
         go.name = $"{type}_{shapes.Count}";
+        go.layer = LayerMask.NameToLayer("Shapes");
         go.transform.position = position;
 
         var data = go.AddComponent<ShapeData>();

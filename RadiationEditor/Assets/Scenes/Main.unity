@@ -2809,7 +2809,7 @@ GameObject:
   - component: {fileID: 803592691}
   - component: {fileID: 803592690}
   - component: {fileID: 803592689}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HandleX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3724,7 +3724,7 @@ GameObject:
   - component: {fileID: 988352857}
   - component: {fileID: 988352856}
   - component: {fileID: 988352855}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HandleZ
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5226,6 +5226,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10969c4f9516b44f98ddf171ff30c5ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectionManager
+  gizmoLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  selectableLayers:
+    serializedVersion: 2
+    m_Bits: 64
   cam: {fileID: 963194227}
   gizmo: {fileID: 1412528589}
   hud: {fileID: 1210950241}
@@ -5613,7 +5619,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1412528590}
   - component: {fileID: 1412528589}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: TransformGizmo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5633,6 +5639,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TransformGizmo
   cam: {fileID: 963194227}
+  gizmoLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  handleX: {fileID: 803592688}
+  handleY: {fileID: 1852353792}
+  handleZ: {fileID: 988352854}
+  padding: 0.15
+  scaleWithDistance: 1
+  distanceScale: 0.08
 --- !u!4 &1412528590
 Transform:
   m_ObjectHideFlags: 0
@@ -7621,7 +7636,7 @@ GameObject:
   - component: {fileID: 1852353795}
   - component: {fileID: 1852353794}
   - component: {fileID: 1852353793}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HandleY
   m_TagString: Untagged
   m_Icon: {fileID: 0}
