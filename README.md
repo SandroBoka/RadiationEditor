@@ -15,6 +15,8 @@ and export all relevant data into a **CSV file** for further processing.
 
 ---
 
+<img width="1512" height="982" alt="Screenshot 2026-01-11 at 21 59 45" src="https://github.com/user-attachments/assets/7b21b9c7-f9f5-45cf-917f-c01650512f61" />
+
 ## Getting Started
 
 The editor will be distributed as part of a **standalone desktop application**.
@@ -132,7 +134,13 @@ radiation_shapes_20260111_154233.csv
 
 Each row in the CSV represents one object in the scene.
 
-### CSV Header
+### CSV Header example for the image given
 
 ```csv
 id,type,material,px,py,pz,sx,sy,sz,rx,ry,rz,radius,radiusX,radiusZ,height
+0,Cylinder,Concrete,0,1.705905,-3.170371,1,1,1,0,0,0,0,0.5,0.5,2
+1,Sphere,Radioactive,0.058658,1.641646,-1.828835,0.5,0.5,0.5,0,0,0,0.25,0,0,0
+2,Cylinder,Lead,0,1.570197,0,1,1,1,0,45,45,0,0.5,0.5,2
+
+
+
