@@ -11,7 +11,7 @@ The editor is designed to help simulation and research teams define:
 and export all relevant data into a **CSV file** for further processing.
 
 > **Note**  
-> This tool does **not** perform radiation calculations.  
+> This tool does **not** perform calculations.  
 
 ---
 
