@@ -12,21 +12,17 @@ and export all relevant data into a **CSV file** for further processing.
 
 > **Note**  
 > This tool does **not** perform radiation calculations.  
-> It is strictly a geometry and metadata authoring tool.
 
 ---
 
 ## Getting Started
 
-The editor is distributed as a **standalone desktop application**.
+The editor will be distributed as part of a **standalone desktop application**.
 
 ### Supported Platforms
-- macOS (Apple Silicon – ARM64)
+- macOS
 - Windows
 - Linux
-
-No Unity installation is required to run the application.
-
 ---
 
 ## Camera Controls
@@ -102,6 +98,7 @@ When an object is selected, the HUD displays editable numeric fields.
 ## Materials
 
 - Each object can be assigned a material from a predefined list
+- Currently that is Air, Lead, Concreate, Radioactive, Sensor
 - Material changes are applied immediately
 - Material names are exported to the CSV file
 
