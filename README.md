@@ -141,6 +141,145 @@ id,type,material,px,py,pz,sx,sy,sz,rx,ry,rz,radius,radiusX,radiusZ,height
 0,Cylinder,Concrete,0,1.705905,-3.170371,1,1,1,0,0,0,0,0.5,0.5,2
 1,Sphere,Radioactive,0.058658,1.641646,-1.828835,0.5,0.5,0.5,0,0,0,0.25,0,0,0
 2,Cylinder,Lead,0,1.570197,0,1,1,1,0,45,45,0,0.5,0.5,2
+```
 
+# Script Guide
 
+### `Assets/Scripts/Core`
+
+- `SelectionManager` (`RadiationEditor/Assets/Scripts/Core/SelectionManager.cs`)
+  - Handles click selection using raycasts.
+  - Ignores clicks on the gizmo layer so selection does not change while dragging.
+  - Updates `TransformGizmo` and `TransformHud` target when selection changes.
+  - Uses `gizmoLayer` and `selectableLayers` to filter raycasts.
+
+- `ShapeManager` (`RadiationEditor/Assets/Scripts/Core/ShapeManager.cs`)
+  - Singleton (`ShapeManager.I`) that owns the runtime list of shapes.
+  - Creates primitives (cube, sphere, cylinder). Sensor is a small sphere.
+  - Assigns shapes to the `Shapes` layer.
+  - Attaches `ShapeData` and sets material and material name.
+
+### `Assets/Scripts/Data`
+
+- `ShapeType` (`RadiationEditor/Assets/Scripts/Data/ShapeType.cs`)
+  - Enum: Cube, Sphere, Cylinder, Sensor.
+
+- `ShapeData` (`RadiationEditor/Assets/Scripts/Data/ShapeData.cs`)
+  - Stores shape type and selected material name.
+  - Computes derived values (radius, radiusX, radiusZ, height) based on transform scale.
+  - For cubes, derived fields remain zero and are still exported.
+
+- `MaterialLibrary` (`RadiationEditor/Assets/Scripts/Data/MaterialLibrary.cs`)
+  - ScriptableObject listing materials used by the HUD dropdown.
+  - Asset at `RadiationEditor/Assets/ScriptableObjects/MaterialLibrary.asset`.
+
+### `Assets/Scripts/Camera`
+
+- `EditorFlyCamera` (`RadiationEditor/Assets/Scripts/Camera/EditorFlyCamera.cs`)
+  - Free-fly camera using the old Input system (WASD + QE, RMB look, Left Shift boost).
+  - Applies yaw and pitch with mouse deltas while RMB is held.
+
+### `Assets/Scripts/Gizmo`
+
+- `TransformGizmo` (`RadiationEditor/Assets/Scripts/Gizmo/TransformGizmo.cs`)
+  - Shows and positions the gizmo around the selected object.
+  - Raycasts against the `Gizmo` layer to detect handle clicks.
+  - Drags along the active axis using a camera-aligned plane.
+  - Optional distance scaling so the gizmo stays readable.
+
+- `GizmoHandle` (`RadiationEditor/Assets/Scripts/Gizmo/GizmoHandle.cs`)
+  - Procedurally builds an arrow mesh for each axis.
+  - Colors axes (X red, Y green, Z blue).
+  - Requires a MeshFilter and MeshRenderer.
+
+- `GizmoAxis` (`RadiationEditor/Assets/Scripts/Gizmo/GizmoAxis.cs`)
+  - Enum: X, Y, Z.
+
+### `Assets/Scripts/UI`
+
+- `TransformHud` (`RadiationEditor/Assets/Scripts/UI/TransformHud.cs`)
+  - Drives the HUD input fields and material dropdown.
+  - Updates UI text from the selected object each frame unless the user is editing a field.
+  - Applies position, scale, rotation, and material changes back to the selected object.
+  - Deletes the selected object and clears selection via `SelectionManager`.
+  - Populates the material dropdown from `MaterialLibrary`.
+
+- `HudSpawner` (`RadiationEditor/Assets/Scripts/UI/HudSpawner.cs`)
+  - Spawns shapes from HUD buttons.
+  - Uses current material dropdown selection.
+  - Spawns in front of the camera, or on the raycast hit point if the mouse is over geometry.
+
+### `Assets/Scripts/Export`
+
+- `CsvExporter` (`RadiationEditor/Assets/Scripts/Export/CsvExporter.cs`)
+  - Exports all shapes to CSV with a fixed header.
+  - Writes to the user Desktop (falls back to `Application.persistentDataPath`).
+  - Uses `ShapeData.RecomputeDerived()` before exporting.
+
+- `CsvImporter` (`RadiationEditor/Assets/Scripts/Export/CsvImporter.cs`)
+  - Opens a CSV and recreates shapes from rows.
+  - Uses Unity Editor file picker in editor builds, and StandaloneFileBrowser in standalone builds.
+  - Validates header and numeric fields; logs warnings for invalid rows.
+  - Optional `clearExisting` to wipe shapes before import.
+
+## Runtime Flow
+
+- Spawn:
+  - `HudSpawner` calls `ShapeManager.CreateShape`.
+  - The new primitive gets a `ShapeData` component and material assignment.
+
+- Select:
+  - `SelectionManager` raycasts on left click.
+  - If a shape is hit, `TransformGizmo` and `TransformHud` target that shape.
+
+- Move:
+  - `TransformGizmo` detects handle clicks and drags along one axis.
+  - The gizmo repositions around the object every frame.
+
+- Edit:
+  - `TransformHud` writes to transform values and updates derived fields.
+  - Material changes update renderer material and `materialName`.
+
+- Export/Import:
+  - `CsvExporter` builds a row per shape and saves it.
+  - `CsvImporter` reads rows, creates shapes, assigns transforms and materials.
+
+## Architecture Diagram (High Level)
+
+```
+                         +------------------+
+                         |    HUDCanvas     |
+                         | (HUDPanel, UI)   |
+                         +---------+--------+
+                                   |
+           +-----------------------+-----------------------+
+           |                                               |
+  +--------v--------+                           +----------v---------+
+  |   HudSpawner    |                           |    TransformHud    |
+  | (spawn buttons) |                           | (edit fields, del) |
+  +--------+--------+                           +----------+---------+
+           |                                               |
+           |                                               |
+  +--------v--------+                           +----------v---------+
+  |   ShapeManager  |<--------------------------|  SelectionManager  |
+  | (create/list)   |         select/deselect   | (raycast selection)|
+  +--------+--------+                           +----------+---------+
+           |                                               |
+           |                         +---------------------+--------+
+           |                         |  TransformGizmo (move tool)  |
+           |                         +---------------------+--------+
+           |                                               |
+  +--------v--------+                                      |
+  |    ShapeData    |<-------------------------------------+
+  | (type + derived)|
+  +--------+--------+
+           |
+           |
+  +--------v--------+        file dialog       +---------------------+
+  |   CsvExporter   |------------------------->|   Desktop CSV File   |
+  +-----------------+                          +---------------------+
+  +-----------------+<-------------------------|   CsvImporter        |
+  | (read CSV)      |        file dialog       | (StandaloneFileBrowser)
+  +-----------------+                          +---------------------+
+```
 
