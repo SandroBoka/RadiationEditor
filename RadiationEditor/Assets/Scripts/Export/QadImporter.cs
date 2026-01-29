@@ -165,6 +165,8 @@ public class QadImporter : MonoBehaviour
         Vector3 scale = new Vector3(sx, sy, sz);
         Vector3 rotation = new Vector3(rx, ry, rz);
 
+        (position, scale) = NormalizeScaleAndPosition(position, scale);
+
         string materialName = fields[2].Trim();
         Material mat = FindMaterial(materialName);
 
@@ -212,149 +214,81 @@ public class QadImporter : MonoBehaviour
 
         var t = Split(line);
 
-        static string F(float v)
-        {
-            return v.ToString("G", CultureInfo.InvariantCulture);
-        }
-
-        bool TryGet(string value, out float parsed)
-        {
-            return float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out parsed);
-        }
-
         void AddCommon(
             string id,
             string type,
             string material,
-            Vector3 position,
-            Vector3 scale,
-            Vector3 rotation,
-            float r,
-            float rX,
-            float rZ,
-            float height)
+            string px, string py, string pz,
+            string sx, string sy, string sz,
+            string rx, string ry, string rz,
+            string r, string rX, string rZ,
+            string height)
         {
             result.Add(id);
             result.Add(type);
             result.Add(material);
 
-            result.Add(F(position.x));
-            result.Add(F(position.y));
-            result.Add(F(position.z));
+            result.Add(px);
+            result.Add(py);
+            result.Add(pz);
 
-            result.Add(F(scale.x));
-            result.Add(F(scale.y));
-            result.Add(F(scale.z));
+            result.Add(sx);
+            result.Add(sy);
+            result.Add(sz);
 
-            result.Add(F(rotation.x));
-            result.Add(F(rotation.y));
-            result.Add(F(rotation.z));
+            result.Add(rx);
+            result.Add(ry);
+            result.Add(rz);
 
-            result.Add(F(r));
-            result.Add(F(rX));
-            result.Add(F(rZ));
+            result.Add(r);
+            result.Add(rX);
+            result.Add(rZ);
 
-            result.Add(F(height));
+            result.Add(height);
         }
 
         if (line.StartsWith("SPH"))
         {
-            if (t.Length < 6)
-                return result;
-            if (!TryGet(t[2], out float x) ||
-                !TryGet(t[3], out float y) ||
-                !TryGet(t[4], out float z) ||
-                !TryGet(t[5], out float radius))
-                return result;
-
-            Vector3 position = new Vector3(x, y, z);
-            Vector3 scale = Vector3.one * (radius * 2f);
-            Vector3 rotation = Vector3.zero;
             AddCommon(
                 id: t[1],
                 type: "Sphere",
                 material: "Concrete",
-                position: position,
-                scale: scale,
-                rotation: rotation,
-                r: radius,
-                rX: 0f,
-                rZ: 0f,
-                height: 0f
+                px: t[2], py: t[3], pz: t[4],
+                sx: "1", sy: "1", sz: "1",
+                rx: "0", ry: "0", rz: "0",
+                r: t[5], rX: "0", rZ: "0",
+                height: "0"
             );
         }
         else if (line.StartsWith("RPP"))
         {
-            if (t.Length < 8)
-                return result;
-            if (!TryGet(t[2], out float x1) ||
-                !TryGet(t[3], out float x2) ||
-                !TryGet(t[4], out float y1) ||
-                !TryGet(t[5], out float y2) ||
-                !TryGet(t[6], out float z1) ||
-                !TryGet(t[7], out float z2))
-                return result;
-
-            float minX = Mathf.Min(x1, x2);
-            float maxX = Mathf.Max(x1, x2);
-            float minY = Mathf.Min(y1, y2);
-            float maxY = Mathf.Max(y1, y2);
-            float minZ = Mathf.Min(z1, z2);
-            float maxZ = Mathf.Max(z1, z2);
-
-            Vector3 position = new Vector3((minX + maxX) * 0.5f, (minY + maxY) * 0.5f, (minZ + maxZ) * 0.5f);
-            Vector3 scale = new Vector3(maxX - minX, maxY - minY, maxZ - minZ);
-            Vector3 rotation = Vector3.zero;
             AddCommon(
                 id: t[1],
                 type: "Cube",
                 material: "Concrete",
-                position: position,
-                scale: scale,
-                rotation: rotation,
-                r: 0f,
-                rX: 0f,
-                rZ: 0f,
-                height: 0f
+                px: t[2], py: t[3], pz: t[4],
+                sx: t[5], sy: t[6], sz: t[7],
+                rx: "0", ry: "0", rz: "0",
+                r: "0", rX: "0", rZ: "0",
+                height: "0"
             );
         }
         else if (line.StartsWith("RCC"))
         {
-            if (t.Length < 9)
-                return result;
-            if (!TryGet(t[2], out float x) ||
-                !TryGet(t[3], out float y) ||
-                !TryGet(t[4], out float z) ||
-                !TryGet(t[5], out float dx) ||
-                !TryGet(t[6], out float dy) ||
-                !TryGet(t[7], out float dz) ||
-                !TryGet(t[8], out float radius))
-                return result;
-
-            Vector3 axis = new Vector3(dx, dy, dz);
-            float height = axis.magnitude;
-            Vector3 position = new Vector3(x, y, z) + axis * 0.5f;
-            Vector3 scale = new Vector3(radius * 2f, height * 0.5f, radius * 2f);
-            Vector3 rotation = axis.sqrMagnitude > 0f
-                ? Quaternion.FromToRotation(Vector3.up, axis.normalized).eulerAngles
-                : Vector3.zero;
             AddCommon(
                 id: t[1],
                 type: "Cylinder",
                 material: "Concrete",
-                position: position,
-                scale: scale,
-                rotation: rotation,
-                r: 0f,
-                rX: radius,
-                rZ: radius,
-                height: height
+                px: t[2], py: t[3], pz: t[4],
+                sx: "1", sy: "1", sz: "1",
+                rx: "0", ry: "0", rz: "0",
+                r: "0", rX: t[8], rZ: t[8],
+                height: t[7]
             );
         }
 
         return result;
     }
-
 
     static string[] Split(string line)
     {
@@ -363,4 +297,30 @@ public class QadImporter : MonoBehaviour
             StringSplitOptions.RemoveEmptyEntries
         );
     }
+
+    static (Vector3 position, Vector3 scale) NormalizeScaleAndPosition(
+        Vector3 position,
+        Vector3 scale)
+    {
+        if (scale.x < 0f)
+        {
+            position.x += scale.x;
+            scale.x = -scale.x;
+        }
+
+        if (scale.y < 0f)
+        {
+            position.y += scale.y;
+            scale.y = -scale.y;
+        }
+
+        if (scale.z < 0f)
+        {
+            position.z += scale.z;
+            scale.z = -scale.z;
+        }
+
+        return (position, scale);
+    }
+
 }
