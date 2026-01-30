@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PdfOpener : MonoBehaviour
 {
-    [SerializeField] private string relativePath = "data/pdf/Primjena plazme u industriji pročišćavanja otpadnih voda.docx.pdf";
+    [SerializeField] private string relativePath = "data/pdf/Primjena_plazme_u_industriji_procisavanja_otpadnih_voda.pdf";
 
     public void OpenPdf()
     {

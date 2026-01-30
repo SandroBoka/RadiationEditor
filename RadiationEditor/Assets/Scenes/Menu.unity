@@ -259,9 +259,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3300000001}
+      - m_Target: {fileID: 102900000, guid: 0439b644227d457d9575e0b5a18a3a27, type: 3}
         m_TargetAssemblyTypeName: OpenPdfButton, Assembly-CSharp
-        m_MethodName: OpenPdf
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2110,8 +2110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b53db50c2af94638bb69018c78ce4ecc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  relativePath: "data/pdf/Primjena plazme u industriji proc\u030Cis\u030Cc\u0301avanja
-    otpadnih voda.docx.pdf"
+  relativePath: data/pdf/Primjena_plazme_u_industriji_procisavanja_otpadnih_voda.pdf
 --- !u!1 &4000000100
 GameObject:
   m_ObjectHideFlags: 0
