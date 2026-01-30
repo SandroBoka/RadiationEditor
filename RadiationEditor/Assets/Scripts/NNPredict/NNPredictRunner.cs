@@ -28,16 +28,33 @@ public class NNPredictRunner : MonoBehaviour
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private TMP_Text outputText;
     [SerializeField] private Button runButton;
+    [SerializeField] private Button backButton;
 
     bool isRunning;
 
     void Awake()
     {
-        runButton.onClick.AddListener(RunPredict);
+        if (runButton != null)
+            runButton.onClick.AddListener(RunPredict);
+        if (backButton == null)
+            backButton = FindByName<Button>("BackButton");
+        if (backButton != null)
+            backButton.onClick.AddListener(SceneManager.LoadMenu);
 
-        inputA.contentType = TMP_InputField.ContentType.DecimalNumber;
-        inputB.contentType = TMP_InputField.ContentType.DecimalNumber;
-        inputC.contentType = TMP_InputField.ContentType.DecimalNumber;
+        if (inputA != null)
+            inputA.contentType = TMP_InputField.ContentType.DecimalNumber;
+        if (inputB != null)
+            inputB.contentType = TMP_InputField.ContentType.DecimalNumber;
+        if (inputC != null)
+            inputC.contentType = TMP_InputField.ContentType.DecimalNumber;
+    }
+
+    void OnDestroy()
+    {
+        if (runButton != null)
+            runButton.onClick.RemoveListener(RunPredict);
+        if (backButton != null)
+            backButton.onClick.RemoveListener(SceneManager.LoadMenu);
     }
 
     async void RunPredict()
@@ -160,5 +177,32 @@ public class NNPredictRunner : MonoBehaviour
     void SetOutput(string msg)
     {
         outputText.text = msg ?? "";
+    }
+
+    T FindByName<T>(string name) where T : Component
+    {
+        var rootObjects = gameObject.scene.GetRootGameObjects();
+        foreach (var root in rootObjects)
+        {
+            var found = FindInChildren<T>(root.transform, name);
+            if (found != null)
+                return found;
+        }
+        return null;
+    }
+
+    T FindInChildren<T>(Transform parent, string name) where T : Component
+    {
+        if (parent.name == name)
+            return parent.GetComponent<T>();
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            var child = parent.GetChild(i);
+            var found = FindInChildren<T>(child, name);
+            if (found != null)
+                return found;
+        }
+        return null;
     }
 }
