@@ -95,6 +95,7 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
             }
 
             selectedPath = path;
+            SetSelectedPath(Path.GetFileName(path));
             RunAppAsync(path, points);
         });
     }
@@ -218,6 +219,8 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
             await Task.Run(() => process.WaitForExit());
 
             string output = stdout.ToString();
+            if (!string.IsNullOrWhiteSpace(output))
+                output = RemoveFirstLine(output);
             string error = stderr.ToString();
             SetOutput(string.IsNullOrWhiteSpace(output) ? error : output);
 
@@ -334,6 +337,16 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
     {
         if (runButton != null)
             runButton.interactable = isInteractable;
+    }
+
+    static string RemoveFirstLine(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+
+        using var reader = new StringReader(text);
+        reader.ReadLine(); // drop first line
+        return reader.ReadToEnd().TrimStart('\r', '\n');
     }
 
     static T FindByName<T>(string objectName) where T : Component
