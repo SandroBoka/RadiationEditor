@@ -1358,7 +1358,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee9d52a466f0487fafa0b05aef65c857, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: Proracun
+  sceneName: RayPlaneIntersection
 --- !u!1 &6147512126447099631
 GameObject:
   m_ObjectHideFlags: 0
