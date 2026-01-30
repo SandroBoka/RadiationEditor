@@ -170,6 +170,9 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
             return;
         }
 
+        if (!CheckWindowsDependencies(appPath))
+            return;
+
         isRunning = true;
         SetStatus("Running...");
         SetOutput("");
@@ -277,6 +280,36 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
             default:
                 return string.Empty;
         }
+    }
+
+    bool CheckWindowsDependencies(string appPath)
+    {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        string dir = Path.GetDirectoryName(appPath);
+        if (string.IsNullOrEmpty(dir))
+            return true;
+
+        string[] required =
+        {
+            "libgcc_s_seh-1.dll",
+            "libstdc++-6.dll",
+            "libwinpthread-1.dll"
+        };
+
+        var missing = new List<string>();
+        foreach (var dll in required)
+        {
+            if (!File.Exists(Path.Combine(dir, dll)))
+                missing.Add(dll);
+        }
+
+        if (missing.Count > 0)
+        {
+            SetStatus("Missing DLLs next to app.exe: " + string.Join(", ", missing));
+            return false;
+        }
+#endif
+        return true;
     }
 
     void SetStatus(string message)
