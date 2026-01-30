@@ -5,6 +5,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 using SFB;
 
 #if UNITY_EDITOR
@@ -19,71 +21,61 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
     [SerializeField] private string windowsAppName = "app.exe";
 
     [Header("UI")]
+    [SerializeField] private TMP_Text titleText;
+    [SerializeField] private TMP_InputField pointsInput;
+    [SerializeField] private Button runButton;
+    [SerializeField] private Button backButton;
+    [SerializeField] private TMP_Text selectedPathText;
+    [SerializeField] private TMP_Text statusText;
+    [SerializeField] private TMP_Text outputText;
     [SerializeField] private string title = "Ray-Plane Intersection";
     [SerializeField] private int minPoints = 1;
 
-    string pointsText = "";
     string selectedPath = "";
-    string statusMessage = "Enter number of points and choose a CSV file.";
-    string outputText = "";
-    Vector2 outputScroll;
     bool isRunning;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void EnsureRunnerInScene()
+    void Awake()
     {
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "RayPlaneIntersection")
-            return;
+        if (titleText == null)
+            titleText = FindByName<TMP_Text>("RayPlaneTitle");
+        if (pointsInput == null)
+            pointsInput = FindByName<TMP_InputField>("PointsInput");
+        if (runButton == null)
+            runButton = FindByName<Button>("RunButton");
+        if (backButton == null)
+            backButton = FindByName<Button>("BackButton");
+        if (selectedPathText == null)
+            selectedPathText = FindByName<TMP_Text>("SelectedPathText");
+        if (statusText == null)
+            statusText = FindByName<TMP_Text>("StatusText");
+        if (outputText == null)
+            outputText = FindByName<TMP_Text>("OutputText");
 
-        if (FindObjectOfType<RayPlaneIntersectionRunner>() != null)
-            return;
+        if (titleText != null)
+            titleText.text = title;
 
-        var go = new GameObject("RayPlaneIntersectionRunner");
-        go.AddComponent<RayPlaneIntersectionRunner>();
+        if (pointsInput != null)
+        {
+            pointsInput.contentType = TMP_InputField.ContentType.IntegerNumber;
+            pointsInput.characterLimit = 9;
+        }
+
+        if (runButton != null)
+            runButton.onClick.AddListener(BeginSelectAndRun);
+        if (backButton != null)
+            backButton.onClick.AddListener(SceneManager.LoadMenu);
+
+        SetStatus("Enter number of points and choose a CSV file.");
+        SetSelectedPath("-");
+        SetOutput("");
     }
 
-    void OnGUI()
+    void OnDestroy()
     {
-        float width = Mathf.Min(700f, Screen.width - 40f);
-        float height = Mathf.Min(560f, Screen.height - 40f);
-        Rect panelRect = new Rect(20f, 20f, width, height);
-
-        GUIStyle headerStyle = new GUIStyle(GUI.skin.label)
-        {
-            fontSize = 18,
-            fontStyle = FontStyle.Bold
-        };
-
-        GUILayout.BeginArea(panelRect, GUI.skin.box);
-        GUILayout.Label(title, headerStyle);
-        GUILayout.Space(8f);
-
-        GUILayout.Label("Number of points to generate:");
-        pointsText = GUILayout.TextField(pointsText, GUILayout.Height(26f));
-
-        GUILayout.Space(6f);
-        GUI.enabled = !isRunning;
-        if (GUILayout.Button(isRunning ? "Running..." : "Select CSV & Run", GUILayout.Height(32f)))
-        {
-            BeginSelectAndRun();
-        }
-        GUI.enabled = true;
-
-        GUILayout.Space(6f);
-        GUILayout.Label("Selected CSV: " + (string.IsNullOrEmpty(selectedPath) ? "-" : selectedPath));
-        GUILayout.Label("Status: " + statusMessage);
-
-        GUILayout.Space(10f);
-        GUILayout.Label("Output:");
-        outputScroll = GUILayout.BeginScrollView(outputScroll, GUILayout.ExpandHeight(true));
-        GUILayout.TextArea(outputText ?? string.Empty, GUILayout.ExpandHeight(true));
-        GUILayout.EndScrollView();
-
-        GUILayout.Space(6f);
-        if (GUILayout.Button("Go Back", GUILayout.Height(30f)))
-            SceneManager.LoadMenu();
-
-        GUILayout.EndArea();
+        if (runButton != null)
+            runButton.onClick.RemoveListener(BeginSelectAndRun);
+        if (backButton != null)
+            backButton.onClick.RemoveListener(SceneManager.LoadMenu);
     }
 
     void BeginSelectAndRun()
@@ -98,7 +90,7 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
         {
             if (string.IsNullOrEmpty(path))
             {
-                statusMessage = "CSV selection canceled.";
+                SetStatus("CSV selection canceled.");
                 return;
             }
 
@@ -109,15 +101,22 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
 
     bool TryParsePoints(out int points)
     {
-        if (!int.TryParse(pointsText, out points))
+        points = 0;
+        if (pointsInput == null || string.IsNullOrWhiteSpace(pointsInput.text))
         {
-            statusMessage = "Please enter a valid whole number.";
+            SetStatus("Please enter a valid whole number.");
+            return false;
+        }
+
+        if (!int.TryParse(pointsInput.text, out points))
+        {
+            SetStatus("Please enter a valid whole number.");
             return false;
         }
 
         if (points < minPoints)
         {
-            statusMessage = $"Number of points must be at least {minPoints}.";
+            SetStatus($"Number of points must be at least {minPoints}.");
             return false;
         }
 
@@ -154,7 +153,7 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
         }
         catch (Exception ex)
         {
-            statusMessage = "CSV open failed: " + ex.Message;
+            SetStatus("CSV open failed: " + ex.Message);
         }
 #endif
     }
@@ -167,13 +166,14 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
         string appPath = ResolveAppPath(out string lookupDetails);
         if (string.IsNullOrEmpty(appPath) || !File.Exists(appPath))
         {
-            statusMessage = "App not found. " + lookupDetails;
+            SetStatus("App not found. " + lookupDetails);
             return;
         }
 
         isRunning = true;
-        statusMessage = "Running...";
-        outputText = string.Empty;
+        SetStatus("Running...");
+        SetOutput("");
+        SetRunInteractable(false);
 
         try
         {
@@ -205,7 +205,7 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
 
             if (!process.Start())
             {
-                statusMessage = "Failed to start the process.";
+                SetStatus("Failed to start the process.");
                 return;
             }
 
@@ -216,22 +216,23 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
 
             string output = stdout.ToString();
             string error = stderr.ToString();
-            outputText = string.IsNullOrWhiteSpace(output) ? error : output;
+            SetOutput(string.IsNullOrWhiteSpace(output) ? error : output);
 
-            statusMessage = process.ExitCode == 0
+            SetStatus(process.ExitCode == 0
                 ? "Completed."
-                : $"Process exited with code {process.ExitCode}.";
+                : $"Process exited with code {process.ExitCode}.");
 
-            if (string.IsNullOrWhiteSpace(outputText))
-                statusMessage += " No output captured.";
+            if (outputText != null && string.IsNullOrWhiteSpace(outputText.text))
+                SetStatus(statusText != null ? statusText.text + " No output captured." : "No output captured.");
         }
         catch (Exception ex)
         {
-            statusMessage = "Run failed: " + ex.Message;
+            SetStatus("Run failed: " + ex.Message);
         }
         finally
         {
             isRunning = false;
+            SetRunInteractable(true);
         }
     }
 
@@ -276,5 +277,35 @@ public class RayPlaneIntersectionRunner : MonoBehaviour
             default:
                 return string.Empty;
         }
+    }
+
+    void SetStatus(string message)
+    {
+        if (statusText != null)
+            statusText.text = "Status: " + message;
+    }
+
+    void SetSelectedPath(string path)
+    {
+        if (selectedPathText != null)
+            selectedPathText.text = "Selected CSV: " + path;
+    }
+
+    void SetOutput(string text)
+    {
+        if (outputText != null)
+            outputText.text = string.IsNullOrEmpty(text) ? string.Empty : text;
+    }
+
+    void SetRunInteractable(bool isInteractable)
+    {
+        if (runButton != null)
+            runButton.interactable = isInteractable;
+    }
+
+    static T FindByName<T>(string objectName) where T : Component
+    {
+        var obj = GameObject.Find(objectName);
+        return obj != null ? obj.GetComponent<T>() : null;
     }
 }
