@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Diagnostics;
 using UnityEngine;
 
 public class OpenPdfButton : MonoBehaviour
@@ -16,10 +17,21 @@ public class OpenPdfButton : MonoBehaviour
 
         if (!File.Exists(path))
         {
-            Debug.LogWarning($"PDF not found at '{path}'.");
+            UnityEngine.Debug.LogWarning($"PDF not found at '{path}'.");
             return;
         }
 
-        Application.OpenURL(new Uri(path).AbsoluteUri);
+        try
+        {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+#else
+            Application.OpenURL(new Uri(path).AbsoluteUri);
+#endif
+        }
+        catch (Exception ex)
+        {
+            UnityEngine.Debug.LogWarning("Failed to open PDF: " + ex.Message);
+        }
     }
 }
