@@ -24,7 +24,15 @@ public class OpenPdfButton : MonoBehaviour
         try
         {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            string fullPath = Path.GetFullPath(path);
+            try
+            {
+                Process.Start(new ProcessStartInfo(fullPath) { UseShellExecute = true });
+            }
+            catch
+            {
+                Process.Start(new ProcessStartInfo("explorer.exe", $"\"{fullPath}\"") { UseShellExecute = true });
+            }
 #else
             Application.OpenURL(new Uri(path).AbsoluteUri);
 #endif
