@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text;
 using UnityEngine;
+using SFB;
 
 public class CsvExporter : MonoBehaviour
 {
@@ -42,7 +43,7 @@ public class CsvExporter : MonoBehaviour
               .AppendLine();
         }
 
-        string fileName = "radiation_shapes_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+        string fileName = "radiation_shapes_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
         // Desktop path (cross-platform)
         string desktop = System.Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory);
@@ -51,11 +52,42 @@ public class CsvExporter : MonoBehaviour
         if (string.IsNullOrEmpty(desktop))
             desktop = Application.persistentDataPath;
 
-        string path = Path.Combine(desktop, fileName);
+        string content = sb.ToString();
 
-        File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
+#if UNITY_EDITOR
+        string path = UnityEditor.EditorUtility.SaveFilePanel(
+            "Save CSV",
+            desktop,
+            fileName,
+            "csv");
 
-        Debug.Log("CSV exported: " + path);
+        if (string.IsNullOrEmpty(path))
+            return;
+
+        WriteCsv(path, content);
+#else
+        var extensions = new[]
+        {
+            new ExtensionFilter("CSV", "csv"),
+            new ExtensionFilter("All Files", "*")
+        };
+
+#if UNITY_STANDALONE_OSX
+        string path = StandaloneFileBrowser.SaveFilePanel("Save CSV", desktop, fileName, extensions);
+        if (string.IsNullOrEmpty(path))
+            return;
+
+        WriteCsv(path, content);
+#else
+        StandaloneFileBrowser.SaveFilePanelAsync("Save CSV", desktop, fileName, extensions, path =>
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            WriteCsv(path, content);
+        });
+#endif
+#endif
     }
 
     string Escape(string v)
@@ -64,5 +96,14 @@ public class CsvExporter : MonoBehaviour
         if (v.Contains(",") || v.Contains("\""))
             return "\"" + v.Replace("\"", "\"\"") + "\"";
         return v;
+    }
+
+    void WriteCsv(string path, string content)
+    {
+        if (string.IsNullOrEmpty(Path.GetExtension(path)))
+            path += ".csv";
+
+        File.WriteAllText(path, content, Encoding.UTF8);
+        Debug.Log("CSV exported: " + path);
     }
 }
