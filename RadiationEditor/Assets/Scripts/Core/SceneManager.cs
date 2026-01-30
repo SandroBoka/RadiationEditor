@@ -22,4 +22,5 @@ public static class SceneManager
 
     public static void LoadMenu() => LoadScene("Menu");
     public static void Load3DEditor() => LoadScene("3D Editor");
+    public static void LoadNNPredikcija() => LoadScene("NN Predikcija");
 }
