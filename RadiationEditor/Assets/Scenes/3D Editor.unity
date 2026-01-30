@@ -7697,8 +7697,8 @@ GameObject:
   - component: {fileID: 1351499058}
   - component: {fileID: 1351499060}
   - component: {fileID: 1351499061}
-  - component: {fileID: 2099999985}
-  - component: {fileID: 2099999986}
+  - component: {fileID: 1351499062}
+  - component: {fileID: 1351499063}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -7768,6 +7768,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35879e9a2ae5f4bb3af9729937dc83e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CsvExporter
+--- !u!114 &1351499062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351499057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8b600ee6fa4844ddbb2eb0a50ee715e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CsvImporter
+  clearExisting: 1
+--- !u!114 &1351499063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351499057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36726bc6904f5446ab12bfa2fa9ec764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QadImporter
+  clearExisting: 1
 --- !u!1 &1390000125
 GameObject:
   m_ObjectHideFlags: 0
@@ -9752,7 +9778,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2099999985}
+      - m_Target: {fileID: 1351499062}
         m_TargetAssemblyTypeName: CsvImporter, Assembly-CSharp
         m_MethodName: OpenAndImport
         m_Mode: 1
@@ -11662,7 +11688,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2099999986}
+      - m_Target: {fileID: 1351499063}
         m_TargetAssemblyTypeName: QadImporter, Assembly-CSharp
         m_MethodName: OpenAndImport
         m_Mode: 1
@@ -12024,32 +12050,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2052130532}
   m_CullTransparentMesh: 1
---- !u!114 &2099999985
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1351499057}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11040d049434416d898aba7a65c56396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CsvImporter
-  clearExisting: 1
---- !u!114 &2099999986
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1351499057}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50c2500a499f84c2aaf50344823d1a9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::QadImporter
-  clearExisting: 1
 --- !u!114 &2099999996
 MonoBehaviour:
   m_ObjectHideFlags: 0
