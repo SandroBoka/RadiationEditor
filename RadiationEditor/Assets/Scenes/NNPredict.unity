@@ -4464,7 +4464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NNPredictRunner
   appFolderName: Predict
   windowsAppName: predict.exe
-  macAppName: predictMac
+  macAppName: Predict
   modeDropdown: {fileID: 1166638451}
   inputA: {fileID: 1946775376}
   inputB: {fileID: 1233633993}

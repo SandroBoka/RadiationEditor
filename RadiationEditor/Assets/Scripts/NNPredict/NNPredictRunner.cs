@@ -18,7 +18,7 @@ public class NNPredictRunner : MonoBehaviour
     [Header("App")]
     [SerializeField] private string appFolderName = "Predict";
     [SerializeField] private string windowsAppName = "predict.exe";
-    [SerializeField] private string macAppName = "predictMac"; // ako ikad zatreba
+    [SerializeField] private string macAppName = "Predict";
 
     [Header("UI")]
     [SerializeField] private TMP_Dropdown modeDropdown; // c / r
@@ -68,7 +68,7 @@ public class NNPredictRunner : MonoBehaviour
         string appPath = ResolveAppPath();
         if (!File.Exists(appPath))
         {
-            SetStatus("predict.exe not found.");
+            SetStatus("App not found: " + appPath);
             return;
         }
 
@@ -159,12 +159,11 @@ public class NNPredictRunner : MonoBehaviour
 
     string ResolveAppPath()
     {
-        string exeName =
-#if UNITY_STANDALONE_OSX
-            macAppName;
-#else
-            windowsAppName;
-#endif
+        // Use runtime platform so Editor and Player resolve correctly on all OSes.
+        string exeName = Application.platform == RuntimePlatform.OSXEditor ||
+                         Application.platform == RuntimePlatform.OSXPlayer
+            ? macAppName
+            : windowsAppName;
 
         return Path.Combine(Application.streamingAssetsPath, appFolderName, exeName);
     }
