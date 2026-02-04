@@ -1,17 +1,16 @@
 # Radiation Geometry Editor
 
-Radiation Geometry Editor is a lightweight 3D tool for creating and exporting geometric scenes used in **radiation simulation workflows**.
+Radiation Geometry Editor is a Unity-based toolset for building and exporting simple 3D geometry for radiation simulation workflows made for . It now includes a main 3D editor plus additional utility scenes (prediction runner, ray-plane intersection runner, and a PDF opener) available from the menu.
 
-The editor is designed to help simulation and research teams define:
-- simple 3D bodies,
-- materials,
-- exact spatial transformations,
-- and sensor locations,
+This toolset is designed to help simulation and research teams define:
+- simple 3D bodies
+- materials
+- exact spatial transformations
+- sensor locations
 
-and export all relevant data into a **CSV file** for further processing.
+and export all relevant data into CSV for downstream processing.
 
-> **Note**  
-> This tool does **not** perform calculations.  
+Note: The 3D editor does not perform physics or simulation. External executables in `Assets/StreamingAssets` handle computation for the utility scenes.
 
 ---
 
@@ -19,17 +18,28 @@ and export all relevant data into a **CSV file** for further processing.
 
 ## Getting Started
 
-The editor will be distributed as part of a **standalone desktop application**.
+- Open the Unity project at `RadiationEditor/`.
+- Create a folder `Predict` inisde `RadiationEditor/Assets/StreamingAssets`
+- Download this ziped file ([macOS link](https://ferhr-my.sharepoint.com/:u:/g/personal/sb53891_fer_hr/IQCyBaUXU3WKTLZSiIYTM-tqAS7yaA8hAqyu2oe6CMVanpA?e=1MD8iC) , [Windows link](https://ferhr-my.sharepoint.com/:u:/g/personal/sb53891_fer_hr/IQA2A8qyDK0iQJ2-jVQH5OBsASiDCmTtHGAp2exu7MGOdhY?e=NMWq7K) ), unzip it and place the contents inside of it in `Predict` folder
 
 ### Supported Platforms
 - macOS
 - Windows
-- Linux
+
 ---
 
-## Camera Controls
+## Scenes Overview
 
-The editor uses Unity-style free-fly camera controls:
+- `Menu`: Entry scene with buttons to open the editor, utilities, and PDF.
+- `3D Editor`: Main geometry editor for creating shapes, editing transforms, and exporting/importing data.
+- `NNPredict`: UI that runs an external prediction executable and shows its output.
+- `RayPlaneIntersection`: UI that runs an external executable on a CSV input and shows its output.
+
+---
+
+## 3D Editor
+
+### Camera Controls
 
 | Action | Control |
 |------|--------|
@@ -40,246 +50,188 @@ The editor uses Unity-style free-fly camera controls:
 | Rotate camera | Right Mouse Button + Mouse Move |
 | Faster movement | `Left Shift` |
 
----
-
-## Creating Geometry
+### Creating Geometry
 
 The following object types can be added:
-
 - Cube
 - Sphere
 - Cylinder
 - Sensor (treated as a small sphere)
 
 Objects:
-- can overlap freely,
-- can be placed inside other objects,
-- are not restricted by physics or collisions.
+- can overlap freely
+- can be placed inside other objects
+- are not restricted by physics or collisions
 
----
-
-## Object Selection
+### Object Selection
 
 - Left-click an object to select it
-- When selected:
-  - a transform gizmo appears,
-  - the Selection Panel becomes visible
+- When selected, a transform gizmo appears and the Selection Panel becomes visible
 - Left-click in empty space to deselect
 
----
-
-## Transform Gizmo (Move Tool)
+### Transform Gizmo (Move Tool)
 
 When an object is selected:
-- a 3-axis gizmo (X / Y / Z) appears,
-- handles are positioned at the object’s outer bounds,
-- dragging a handle moves the object along that axis only.
+- a 3-axis gizmo (X / Y / Z) appears
+- handles are positioned at the object's outer bounds
+- dragging a handle moves the object along that axis only
 
 The gizmo remains active while the object is selected and does not interfere with selection.
 
----
-
-## Manual Transform Editing (HUD)
+### Manual Transform Editing (HUD)
 
 When an object is selected, the HUD displays editable numeric fields.
 
-### Position (X / Y / Z)
-- World-space position
-- Updates live when using the gizmo
-- Can be edited numerically
+Position (X / Y / Z):
+- world-space position
+- updates live when using the gizmo
+- can be edited numerically
 
-### Scale (X / Y / Z)
-- Non-uniform scaling supported
+Scale (X / Y / Z):
+- non-uniform scaling supported
 
-### Rotation (X / Y / Z)
+Rotation (X / Y / Z):
 - Euler angles (degrees)
-- Applied in world space
+- applied in world space
 
----
-
-## Materials
+### Materials
 
 - Each object can be assigned a material from a predefined list
-- Currently that is Air, Lead, Concreate, Radioactive, Sensor
+- Current default list: Air, Lead, Concrete, Radioactive, Sensor
 - Material changes are applied immediately
-- Material names are exported to the CSV file
+- Material names are exported to CSV
+
+### Deleting Objects
+
+- When an object is selected, a Delete button is shown
+- Clicking Delete removes the object, clears selection, and hides the gizmo and panel
 
 ---
 
-## Deleting Objects
+## Import and Export
 
-- When an object is selected, a **Delete** button is shown
-- Clicking Delete:
-  - removes the object,
-  - clears the current selection,
-  - hides the gizmo and selection panel
+### CSV Export
 
----
-
-## CSV Export
-
-### Exporting
-
-- Click **Export CSV**
-- A CSV file is generated automatically
-- The file is saved to the user’s **Desktop**
+- Click Export CSV
+- A CSV file is generated with a fixed header and one row per shape
+- A save dialog opens (defaulting to the Desktop)
 
 Example filename:
-radiation_shapes_20260111_154233.csv
+`radiation_shapes_20260111_154233.csv`
 
+CSV header:
+```csv
+id,type,material,px,py,pz,sx,sy,sz,rx,ry,rz,radius,radiusX,radiusZ,height
+```
+
+### CSV Import
+
+- Click Import CSV
+- The importer validates the header and ignores invalid rows
+- Optional `clearExisting` can wipe current shapes first
+
+### QAD INP Import
+
+- Click Import QAD
+- Supported record types: `SPH` -> Sphere, `RPP` -> Cube, `RCC` -> Cylinder
+- Imported shapes default to material `Concrete`
+- Negative scale values are normalized into positive scale with adjusted position
 
 ---
 
-## CSV Format
+## Utility Scenes
 
-Each row in the CSV represents one object in the scene.
+### NNPredict
 
-### CSV Header example for the image given
+- Runs an external executable from `Assets/StreamingAssets/Predict`
+- Uses inputs: mode (`c` or `r`) and three float values
+- Output is displayed in the UI (stdout or stderr)
 
-```csv
-id,type,material,px,py,pz,sx,sy,sz,rx,ry,rz,radius,radiusX,radiusZ,height
-0,Cylinder,Concrete,0,1.705905,-3.170371,1,1,1,0,0,0,0,0.5,0.5,2
-1,Sphere,Radioactive,0.058658,1.641646,-1.828835,0.5,0.5,0.5,0,0,0,0.25,0,0,0
-2,Cylinder,Lead,0,1.570197,0,1,1,1,0,45,45,0,0.5,0.5,2
-```
+Expected binaries:
+- macOS: `Assets/StreamingAssets/Predict/Predict`
+- Windows: `Assets/StreamingAssets/Predict/predict.exe`
+
+### Ray-Plane Intersection
+
+- Runs an external executable from `Assets/StreamingAssets/RayPlaneIntersection`
+- Requires a CSV file and number of points
+- Output is displayed in the UI
+
+Expected binaries:
+- macOS: `Assets/StreamingAssets/RayPlaneIntersection/appMac`
+- Windows: `Assets/StreamingAssets/RayPlaneIntersection/app.exe`
+
+Windows note:
+- The runner checks for `libgcc_s_seh-1.dll`, `libstdc++-6.dll`, and `libwinpthread-1.dll` next to `app.exe`.
+
+---
+
+## PDF Opener
+
+The menu includes a button that opens a PDF using the system default viewer.
+
+Default PDF location:
+- `Assets/StreamingAssets/data/pdf/Primjena_plazme_u_industriji_procisavanja_otpadnih_voda.pdf`
+
+If the PDF is missing, a warning is logged.
+
+---
 
 # Script Guide
 
 ### `Assets/Scripts/Core`
 
-- `SelectionManager` (`RadiationEditor/Assets/Scripts/Core/SelectionManager.cs`)
-  - Handles click selection using raycasts.
-  - Ignores clicks on the gizmo layer so selection does not change while dragging.
-  - Updates `TransformGizmo` and `TransformHud` target when selection changes.
-  - Uses `gizmoLayer` and `selectableLayers` to filter raycasts.
-
-- `ShapeManager` (`RadiationEditor/Assets/Scripts/Core/ShapeManager.cs`)
-  - Singleton (`ShapeManager.I`) that owns the runtime list of shapes.
-  - Creates primitives (cube, sphere, cylinder). Sensor is a small sphere.
-  - Assigns shapes to the `Shapes` layer.
-  - Attaches `ShapeData` and sets material and material name.
+- `SelectionManager` (`RadiationEditor/Assets/Scripts/Core/SelectionManager.cs`): Handles click selection using raycasts, ignores gizmo hits, and updates `TransformGizmo` and `TransformHud` targets using `gizmoLayer` and `selectableLayers`.
+- `ShapeManager` (`RadiationEditor/Assets/Scripts/Core/ShapeManager.cs`): Singleton list owner that creates primitives, assigns the `Shapes` layer, and attaches `ShapeData` with material info.
+- `SceneManager` (`RadiationEditor/Assets/Scripts/Core/SceneManager.cs`): Wrapper around Unity SceneManager that validates Build Settings entries before loading.
 
 ### `Assets/Scripts/Data`
 
-- `ShapeType` (`RadiationEditor/Assets/Scripts/Data/ShapeType.cs`)
-  - Enum: Cube, Sphere, Cylinder, Sensor.
-
-- `ShapeData` (`RadiationEditor/Assets/Scripts/Data/ShapeData.cs`)
-  - Stores shape type and selected material name.
-  - Computes derived values (radius, radiusX, radiusZ, height) based on transform scale.
-  - For cubes, derived fields remain zero and are still exported.
-
-- `MaterialLibrary` (`RadiationEditor/Assets/Scripts/Data/MaterialLibrary.cs`)
-  - ScriptableObject listing materials used by the HUD dropdown.
-  - Asset at `RadiationEditor/Assets/ScriptableObjects/MaterialLibrary.asset`.
+- `ShapeType` (`RadiationEditor/Assets/Scripts/Data/ShapeType.cs`): Enum for Cube, Sphere, Cylinder, Sensor.
+- `ShapeData` (`RadiationEditor/Assets/Scripts/Data/ShapeData.cs`): Stores shape type and material name, computes derived values used in CSV export.
+- `MaterialLibrary` (`RadiationEditor/Assets/Scripts/Data/MaterialLibrary.cs`): ScriptableObject listing materials used by the HUD dropdown, asset at `RadiationEditor/Assets/ScriptableObjects/MaterialLibrary.asset`.
 
 ### `Assets/Scripts/Camera`
 
-- `EditorFlyCamera` (`RadiationEditor/Assets/Scripts/Camera/EditorFlyCamera.cs`)
-  - Free-fly camera using the old Input system (WASD + QE, RMB look, Left Shift boost).
-  - Applies yaw and pitch with mouse deltas while RMB is held.
+- `EditorFlyCamera` (`RadiationEditor/Assets/Scripts/Camera/EditorFlyCamera.cs`): Free-fly camera using the old Input system (WASD + QE, RMB look, Left Shift boost).
 
 ### `Assets/Scripts/Gizmo`
 
-- `TransformGizmo` (`RadiationEditor/Assets/Scripts/Gizmo/TransformGizmo.cs`)
-  - Shows and positions the gizmo around the selected object.
-  - Raycasts against the `Gizmo` layer to detect handle clicks.
-  - Drags along the active axis using a camera-aligned plane.
-  - Optional distance scaling so the gizmo stays readable.
-
-- `GizmoHandle` (`RadiationEditor/Assets/Scripts/Gizmo/GizmoHandle.cs`)
-  - Procedurally builds an arrow mesh for each axis.
-  - Colors axes (X red, Y green, Z blue).
-  - Requires a MeshFilter and MeshRenderer.
-
-- `GizmoAxis` (`RadiationEditor/Assets/Scripts/Gizmo/GizmoAxis.cs`)
-  - Enum: X, Y, Z.
+- `TransformGizmo` (`RadiationEditor/Assets/Scripts/Gizmo/TransformGizmo.cs`): Shows and positions the gizmo, raycasts against the `Gizmo` layer, and drags along one axis using a camera-aligned plane.
+- `GizmoHandle` (`RadiationEditor/Assets/Scripts/Gizmo/GizmoHandle.cs`): Builds arrow meshes per axis with X/Y/Z colors.
+- `GizmoAxis` (`RadiationEditor/Assets/Scripts/Gizmo/GizmoAxis.cs`): Enum X, Y, Z.
 
 ### `Assets/Scripts/UI`
 
-- `TransformHud` (`RadiationEditor/Assets/Scripts/UI/TransformHud.cs`)
-  - Drives the HUD input fields and material dropdown.
-  - Updates UI text from the selected object each frame unless the user is editing a field.
-  - Applies position, scale, rotation, and material changes back to the selected object.
-  - Deletes the selected object and clears selection via `SelectionManager`.
-  - Populates the material dropdown from `MaterialLibrary`.
-
-- `HudSpawner` (`RadiationEditor/Assets/Scripts/UI/HudSpawner.cs`)
-  - Spawns shapes from HUD buttons.
-  - Uses current material dropdown selection.
-  - Spawns in front of the camera, or on the raycast hit point if the mouse is over geometry.
+- `TransformHud` (`RadiationEditor/Assets/Scripts/UI/TransformHud.cs`): Drives input fields and dropdown, applies transform/material edits, and deletes the selected object.
+- `HudSpawner` (`RadiationEditor/Assets/Scripts/UI/HudSpawner.cs`): Spawns shapes from HUD buttons with the currently selected material.
+- `SceneButton` (`RadiationEditor/Assets/Scripts/UI/SceneButton.cs`): UI button helper for loading scenes by name.
+- `OpenPdfButton` (`RadiationEditor/Assets/Scripts/UI/OpenPdfButton.cs`): Opens the configured PDF with the system default application.
+- `PdfOpener` (`RadiationEditor/Assets/Scripts/UI/PdfOpener.cs`): Same behavior as `OpenPdfButton` for other UI contexts.
 
 ### `Assets/Scripts/Export`
 
-- `CsvExporter` (`RadiationEditor/Assets/Scripts/Export/CsvExporter.cs`)
-  - Exports all shapes to CSV with a fixed header.
-  - Writes to the user Desktop (falls back to `Application.persistentDataPath`).
-  - Uses `ShapeData.RecomputeDerived()` before exporting.
+- `CsvExporter` (`RadiationEditor/Assets/Scripts/Export/CsvExporter.cs`): Exports all shapes to CSV with a fixed header using a save dialog and UTF-8 output.
 
-- `CsvImporter` (`RadiationEditor/Assets/Scripts/Export/CsvImporter.cs`)
-  - Opens a CSV and recreates shapes from rows.
-  - Uses Unity Editor file picker in editor builds, and StandaloneFileBrowser in standalone builds.
-  - Validates header and numeric fields; logs warnings for invalid rows.
-  - Optional `clearExisting` to wipe shapes before import.
+### `Assets/Scripts/Import`
 
-## Runtime Flow
+- `CsvImporter` (`RadiationEditor/Assets/Scripts/Import/CsvImporter.cs`): Opens a CSV, validates the header and numeric values, and recreates shapes (optionally clearing existing shapes).
+- `QadImporter` (`RadiationEditor/Assets/Scripts/Import/QadImporter.cs`): Imports QAD INP SPH/RPP/RCC rows into basic shapes with normalized scale.
 
-- Spawn:
-  - `HudSpawner` calls `ShapeManager.CreateShape`.
-  - The new primitive gets a `ShapeData` component and material assignment.
+### `Assets/Scripts/NNPredict`
 
-- Select:
-  - `SelectionManager` raycasts on left click.
-  - If a shape is hit, `TransformGizmo` and `TransformHud` target that shape.
+- `NNPredictRunner` (`RadiationEditor/Assets/Scripts/NNPredict/NNPredictRunner.cs`): Runs the prediction executable and displays output.
 
-- Move:
-  - `TransformGizmo` detects handle clicks and drags along one axis.
-  - The gizmo repositions around the object every frame.
+### `Assets/Scripts/RayPlaneIntersection`
 
-- Edit:
-  - `TransformHud` writes to transform values and updates derived fields.
-  - Material changes update renderer material and `materialName`.
+- `RayPlaneIntersectionRunner` (`RadiationEditor/Assets/Scripts/RayPlaneIntersection/RayPlaneIntersectionRunner.cs`): Runs the ray-plane intersection executable and displays output.
 
-- Export/Import:
-  - `CsvExporter` builds a row per shape and saves it.
-  - `CsvImporter` reads rows, creates shapes, assigns transforms and materials.
+---
 
-## Architecture Diagram (High Level)
+## Runtime Flow (3D Editor)
 
-```
-                         +------------------+
-                         |    HUDCanvas     |
-                         | (HUDPanel, UI)   |
-                         +---------+--------+
-                                   |
-           +-----------------------+-----------------------+
-           |                                               |
-  +--------v--------+                           +----------v---------+
-  |   HudSpawner    |                           |    TransformHud    |
-  | (spawn buttons) |                           | (edit fields, del) |
-  +--------+--------+                           +----------+---------+
-           |                                               |
-           |                                               |
-  +--------v--------+                           +----------v---------+
-  |   ShapeManager  |<--------------------------|  SelectionManager  |
-  | (create/list)   |         select/deselect   | (raycast selection)|
-  +--------+--------+                           +----------+---------+
-           |                                               |
-           |                         +---------------------+--------+
-           |                         |  TransformGizmo (move tool)  |
-           |                         +---------------------+--------+
-           |                                               |
-  +--------v--------+                                      |
-  |    ShapeData    |<-------------------------------------+
-  | (type + derived)|
-  +--------+--------+
-           |
-           |
-  +--------v--------+        file dialog       +---------------------+
-  |   CsvExporter   |------------------------->|   Desktop CSV File   |
-  +-----------------+                          +---------------------+
-  +-----------------+<-------------------------|   CsvImporter        |
-  | (read CSV)      |        file dialog       | (StandaloneFileBrowser)
-  +-----------------+                          +---------------------+
-```
-
+- Spawn: `HudSpawner` calls `ShapeManager.CreateShape`.
+- Select: `SelectionManager` raycasts on left click and assigns target to `TransformGizmo` and `TransformHud`.
+- Move: `TransformGizmo` drags along one axis using a camera-aligned plane.
+- Edit: `TransformHud` writes to transforms and updates derived fields.
+- Export/Import: `CsvExporter` writes CSV, `CsvImporter` and `QadImporter` recreate shapes.
